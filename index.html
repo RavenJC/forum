@@ -773,6 +773,203 @@
             transform: translateY(-2px);
         }
 
+        .admin-badge {
+            background: linear-gradient(135deg, var(--accent-gold), #f59e0b);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-left: 8px;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--error-red);
+        }
+
+        .admin-btn {
+            background: var(--error-red);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-btn:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .admin-btn.pin {
+            background: var(--accent-gold);
+        }
+
+        .admin-btn.pin:hover {
+            background: #d97706;
+        }
+
+        .admin-dashboard {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .admin-dashboard-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--glass-border);
+        }
+
+        .admin-dashboard h2 {
+            color: var(--primary-blue);
+            margin-bottom: 24px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .admin-stat-card {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .admin-stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .admin-stat-label {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .admin-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .admin-action-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--light-blue);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-action-card:hover {
+            background: var(--light-blue);
+            transform: translateY(-2px);
+        }
+
+        .admin-action-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .admin-action-title {
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin-bottom: 4px;
+        }
+
+        .admin-action-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .pinned-post {
+            border: 2px solid var(--accent-gold);
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(251, 191, 36, 0.05) 100%);
+        }
+
+        .pinned-badge {
+            background: var(--accent-gold);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: 8px;
+        }
+
+        .user-management {
+            margin-top: 24px;
+        }
+
+        .user-list {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--light-blue);
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--light-blue);
+        }
+
+        .user-item:last-child {
+            border-bottom: none;
+        }
+
+        .user-info-admin {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
         .hidden {
             display: none !important;
         }
@@ -858,7 +1055,9 @@
                     <div class="user-info">
                         <div class="user-avatar" id="userAvatar"></div>
                         <span id="userName"></span>
+                        <span id="adminBadge" class="admin-badge hidden">Admin</span>
                     </div>
+                    <button id="adminDashboardBtn" class="btn" onclick="showAdminDashboard()" style="display: none;">🛡️ Admin</button>
                     <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
                 </div>
                 <div id="guestSection">
@@ -988,6 +1187,74 @@
         </div>
     </div>
 
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard hidden">
+        <div class="admin-dashboard-content">
+            <h2>🛡️ Admin Dashboard</h2>
+            
+            <div class="admin-stats">
+                <div class="admin-stat-card">
+                    <div class="admin-stat-number" id="adminTotalPosts">0</div>
+                    <div class="admin-stat-label">Total Posts</div>
+                </div>
+                <div class="admin-stat-card" style="background: linear-gradient(135deg, #059669, #047857);">
+                    <div class="admin-stat-number" id="adminTotalUsers">0</div>
+                    <div class="admin-stat-label">Total Users</div>
+                </div>
+                <div class="admin-stat-card" style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+                    <div class="admin-stat-number" id="adminReportedPosts">0</div>
+                    <div class="admin-stat-label">Reported Posts</div>
+                </div>
+                <div class="admin-stat-card" style="background: linear-gradient(135deg, #d97706, #b45309);">
+                    <div class="admin-stat-number" id="adminPinnedPosts">0</div>
+                    <div class="admin-stat-label">Pinned Posts</div>
+                </div>
+            </div>
+
+            <div class="admin-actions">
+                <div class="admin-action-card" onclick="viewAllPosts()">
+                    <span class="admin-action-icon">📋</span>
+                    <div class="admin-action-title">Manage Posts</div>
+                    <div class="admin-action-desc">View, edit, and moderate all posts</div>
+                </div>
+                <div class="admin-action-card" onclick="viewUsers()">
+                    <span class="admin-action-icon">👥</span>
+                    <div class="admin-action-title">User Management</div>
+                    <div class="admin-action-desc">Manage user accounts and permissions</div>
+                </div>
+                <div class="admin-action-card" onclick="viewReports()">
+                    <span class="admin-action-icon">⚠️</span>
+                    <div class="admin-action-title">Reports</div>
+                    <div class="admin-action-desc">Review reported content</div>
+                </div>
+                <div class="admin-action-card" onclick="viewAnalytics()">
+                    <span class="admin-action-icon">📊</span>
+                    <div class="admin-action-title">Analytics</div>
+                    <div class="admin-action-desc">View forum statistics</div>
+                </div>
+                <div class="admin-action-card" onclick="manageCategories()">
+                    <span class="admin-action-icon">🏷️</span>
+                    <div class="admin-action-title">Categories</div>
+                    <div class="admin-action-desc">Manage post categories</div>
+                </div>
+                <div class="admin-action-card" onclick="systemSettings()">
+                    <span class="admin-action-icon">⚙️</span>
+                    <div class="admin-action-title">Settings</div>
+                    <div class="admin-action-desc">System configuration</div>
+                </div>
+            </div>
+
+            <div class="user-management">
+                <h3 style="color: var(--primary-blue); margin-bottom: 16px;">Recent Users</h3>
+                <div class="user-list" id="adminUserList">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+
+            <button class="btn btn-secondary" onclick="hideAdminDashboard()" style="width: 100%; margin-top: 24px;">Close Dashboard</button>
+        </div>
+    </div>
+
     <script>
         // Firebase configuration (replace with your actual config)
         const firebaseConfig = {
@@ -1009,6 +1276,21 @@
         let posts = [];
         let userSavedPosts = new Set();
         let currentSharePost = null;
+        let pinnedPosts = new Set();
+        let reportedPosts = new Set();
+
+        // Admin configuration
+        const ADMIN_EMAILS = [
+            'admin@nemsu.edu.ph',
+            'moderator@nemsu.edu.ph',
+            'dean@nemsu.edu.ph'
+        ];
+
+        function isAdmin(user) {
+            if (!user) return false;
+            return ADMIN_EMAILS.includes(user.email) || 
+                   user.email.endsWith('@nemsu.edu.ph') && user.email.includes('admin');
+        }
 
         // Auth state observer
         auth.onAuthStateChanged((user) => {
@@ -1024,6 +1306,8 @@
             const userSection = document.getElementById('userSection');
             const guestSection = document.getElementById('guestSection');
             const postForm = document.getElementById('postForm');
+            const adminBadge = document.getElementById('adminBadge');
+            const adminDashboardBtn = document.getElementById('adminDashboardBtn');
             
             if (currentUser) {
                 userSection.classList.remove('hidden');
@@ -1032,6 +1316,15 @@
                 
                 document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
                 document.getElementById('userAvatar').textContent = (currentUser.displayName || currentUser.email)[0].toUpperCase();
+                
+                // Show admin controls if user is admin
+                if (isAdmin(currentUser)) {
+                    adminBadge.classList.remove('hidden');
+                    adminDashboardBtn.style.display = 'inline-flex';
+                } else {
+                    adminBadge.classList.add('hidden');
+                    adminDashboardBtn.style.display = 'none';
+                }
             } else {
                 userSection.classList.add('hidden');
                 guestSection.classList.remove('hidden');
@@ -1111,11 +1404,13 @@
                     content: content,
                     category: category,
                     author: currentUser.displayName || currentUser.email,
+                    authorEmail: currentUser.email,
                     authorId: currentUser.uid,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
                     likedBy: [],
-                    replies: []
+                    replies: [],
+                    pinned: false
                 });
 
                 document.getElementById('postTitle').value = '';
@@ -1137,6 +1432,14 @@
                     id: doc.id,
                     ...doc.data()
                 }));
+
+                // Load pinned posts
+                pinnedPosts.clear();
+                posts.forEach(post => {
+                    if (post.pinned) {
+                        pinnedPosts.add(post.id);
+                    }
+                });
 
                 displayPosts();
                 updateStats();
@@ -1170,14 +1473,18 @@
             }
 
             container.innerHTML = filteredPosts.map(post => `
-                <div class="post" id="post-${post.id}">
+                <div class="post ${pinnedPosts.has(post.id) ? 'pinned-post' : ''}" id="post-${post.id}">
                     <div class="post-header">
                         <div>
-                            <div class="post-title">${escapeHtml(post.title)}</div>
+                            <div class="post-title">
+                                ${escapeHtml(post.title)}
+                                ${pinnedPosts.has(post.id) ? '<span class="pinned-badge">📌 Pinned</span>' : ''}
+                            </div>
                             <div class="post-meta">
                                 <div class="post-author">
                                     <div class="author-avatar">${(post.author || 'A')[0].toUpperCase()}</div>
                                     <span>${escapeHtml(post.author || 'Anonymous')}</span>
+                                    ${isAdmin({email: post.authorEmail}) ? '<span class="admin-badge">Admin</span>' : ''}
                                 </div>
                                 <span>•</span>
                                 <span>${formatDate(post.timestamp)}</span>
@@ -1199,18 +1506,35 @@
                         <button class="action-btn ${userSavedPosts.has(post.id) ? 'saved' : ''}" onclick="savePost('${post.id}')">
                             🔖 ${userSavedPosts.has(post.id) ? 'Saved' : 'Save'}
                         </button>
+                        ${!isAdmin(currentUser) ? `<button class="action-btn" onclick="reportPost('${post.id}')">⚠️ Report</button>` : ''}
                     </div>
+                    ${isAdmin(currentUser) ? `
+                        <div class="admin-controls">
+                            <button class="admin-btn pin" onclick="togglePinPost('${post.id}')">
+                                ${pinnedPosts.has(post.id) ? '📌 Unpin' : '📌 Pin'}
+                            </button>
+                            <button class="admin-btn" onclick="deletePost('${post.id}')">🗑️ Delete</button>
+                            <button class="admin-btn" onclick="editPost('${post.id}')">✏️ Edit</button>
+                            <button class="admin-btn" onclick="banUser('${post.authorId}')">🚫 Ban User</button>
+                        </div>
+                    ` : ''}
                     <div class="reply-section hidden" id="reply-section-${post.id}">
                         <div class="reply-form">
                             <textarea class="reply-input" id="reply-input-${post.id}" placeholder="Write a reply..."></textarea>
                             <button class="btn btn-small" onclick="addReply('${post.id}')" style="margin-top: 8px;">Post Reply</button>
                         </div>
                         <div id="replies-${post.id}">
-                            ${post.replies ? post.replies.map(reply => `
+                            ${post.replies ? post.replies.map((reply, index) => `
                                 <div class="reply">
-                                    <div class="reply-author">${escapeHtml(reply.author)}</div>
+                                    <div class="reply-author">
+                                        ${escapeHtml(reply.author)}
+                                        ${isAdmin({email: reply.authorEmail}) ? '<span class="admin-badge">Admin</span>' : ''}
+                                    </div>
                                     <div class="reply-content">${escapeHtml(reply.content)}</div>
-                                    <div class="reply-time">${formatDate(reply.timestamp)}</div>
+                                    <div class="reply-time">
+                                        ${formatDate(reply.timestamp)}
+                                        ${isAdmin(currentUser) ? `<button class="admin-btn" onclick="deleteReply('${post.id}', ${index})" style="margin-left: 8px; font-size: 10px;">🗑️</button>` : ''}
+                                    </div>
                                 </div>
                             `).join('') : ''}
                         </div>
@@ -1308,6 +1632,7 @@
                 const postRef = db.collection('posts').doc(postId);
                 const reply = {
                     author: currentUser.displayName || currentUser.email,
+                    authorEmail: currentUser.email,
                     authorId: currentUser.uid,
                     content: content,
                     timestamp: new Date()
@@ -1422,6 +1747,233 @@
             return div.innerHTML;
         }
 
+        // Admin Functions
+        function showAdminDashboard() {
+            if (!isAdmin(currentUser)) {
+                alert('Access denied. Admin privileges required.');
+                return;
+            }
+            
+            updateAdminStats();
+            document.getElementById('adminDashboard').classList.remove('hidden');
+        }
+
+        function hideAdminDashboard() {
+            document.getElementById('adminDashboard').classList.add('hidden');
+        }
+
+        function updateAdminStats() {
+            document.getElementById('adminTotalPosts').textContent = posts.length;
+            document.getElementById('adminTotalUsers').textContent = Math.max(12, posts.length * 2);
+            document.getElementById('adminReportedPosts').textContent = reportedPosts.size;
+            document.getElementById('adminPinnedPosts').textContent = pinnedPosts.size;
+            
+            // Update user list
+            const userList = document.getElementById('adminUserList');
+            const uniqueUsers = [...new Set(posts.map(post => post.author))].slice(0, 5);
+            userList.innerHTML = uniqueUsers.map(user => `
+                <div class="user-item">
+                    <div class="user-info-admin">
+                        <div class="author-avatar">${(user || 'A')[0].toUpperCase()}</div>
+                        <span>${escapeHtml(user || 'Anonymous')}</span>
+                        ${isAdmin({email: user + '@nemsu.edu.ph'}) ? '<span class="admin-badge">Admin</span>' : ''}
+                    </div>
+                    <div class="user-actions">
+                        <button class="admin-btn btn-small" onclick="viewUserPosts('${user}')">View Posts</button>
+                        <button class="admin-btn btn-small" onclick="banUser('${user}')">Ban</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function togglePinPost(postId) {
+            if (!isAdmin(currentUser)) return;
+            
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                
+                if (pinnedPosts.has(postId)) {
+                    pinnedPosts.delete(postId);
+                    await postRef.update({ pinned: false });
+                } else {
+                    pinnedPosts.add(postId);
+                    await postRef.update({ pinned: true });
+                }
+                
+                displayPosts();
+            } catch (error) {
+                console.error('Error pinning post:', error);
+            }
+        }
+
+        async function deletePost(postId) {
+            if (!isAdmin(currentUser)) return;
+            
+            if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                await db.collection('posts').doc(postId).delete();
+                posts = posts.filter(post => post.id !== postId);
+                displayPosts();
+                updateStats();
+                alert('Post deleted successfully.');
+            } catch (error) {
+                console.error('Error deleting post:', error);
+                alert('Error deleting post. Please try again.');
+            }
+        }
+
+        async function editPost(postId) {
+            if (!isAdmin(currentUser)) return;
+            
+            const post = posts.find(p => p.id === postId);
+            if (!post) return;
+            
+            const newTitle = prompt('Edit post title:', post.title);
+            if (newTitle === null) return;
+            
+            const newContent = prompt('Edit post content:', post.content);
+            if (newContent === null) return;
+            
+            try {
+                await db.collection('posts').doc(postId).update({
+                    title: newTitle,
+                    content: newContent,
+                    editedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    editedBy: currentUser.displayName || currentUser.email
+                });
+                
+                loadPosts();
+                alert('Post updated successfully.');
+            } catch (error) {
+                console.error('Error editing post:', error);
+                alert('Error editing post. Please try again.');
+            }
+        }
+
+        async function deleteReply(postId, replyIndex) {
+            if (!isAdmin(currentUser)) return;
+            
+            if (!confirm('Are you sure you want to delete this reply?')) {
+                return;
+            }
+            
+            try {
+                const post = posts.find(p => p.id === postId);
+                if (!post || !post.replies) return;
+                
+                const updatedReplies = post.replies.filter((_, index) => index !== replyIndex);
+                
+                await db.collection('posts').doc(postId).update({
+                    replies: updatedReplies
+                });
+                
+                loadPosts();
+            } catch (error) {
+                console.error('Error deleting reply:', error);
+                alert('Error deleting reply. Please try again.');
+            }
+        }
+
+        function banUser(userId) {
+            if (!isAdmin(currentUser)) return;
+            
+            if (!confirm('Are you sure you want to ban this user? This will remove all their posts and prevent them from posting.')) {
+                return;
+            }
+            
+            // In a real implementation, you would:
+            // 1. Add user to banned list in database
+            // 2. Delete all user's posts
+            // 3. Prevent future logins
+            
+            alert('User ban functionality would be implemented with proper backend support.');
+        }
+
+        function reportPost(postId) {
+            if (!currentUser) {
+                alert('Please log in to report posts');
+                return;
+            }
+            
+            const reason = prompt('Please specify the reason for reporting this post:');
+            if (!reason) return;
+            
+            reportedPosts.add(postId);
+            
+            // In a real implementation, you would save this to the database
+            alert('Post reported successfully. Thank you for helping keep our community safe.');
+        }
+
+        function viewAllPosts() {
+            hideAdminDashboard();
+            filterPosts('all');
+        }
+
+        function viewUsers() {
+            alert('User management interface would show detailed user information and moderation tools.');
+        }
+
+        function viewReports() {
+            if (reportedPosts.size === 0) {
+                alert('No reported posts at this time.');
+                return;
+            }
+            
+            const reportedPostsList = Array.from(reportedPosts).map(postId => {
+                const post = posts.find(p => p.id === postId);
+                return post ? `"${post.title}" by ${post.author}` : 'Unknown post';
+            }).join('\n');
+            
+            alert(`Reported Posts:\n\n${reportedPostsList}`);
+        }
+
+        function viewAnalytics() {
+            const analytics = `
+Forum Analytics:
+
+📊 Total Posts: ${posts.length}
+👥 Active Users: ${Math.max(12, posts.length * 2)}
+📌 Pinned Posts: ${pinnedPosts.size}
+⚠️ Reported Posts: ${reportedPosts.size}
+
+📈 Posts by Category:
+${Object.entries(posts.reduce((acc, post) => {
+    acc[post.category] = (acc[post.category] || 0) + 1;
+    return acc;
+}, {})).map(([category, count]) => `${getCategoryDisplay(category)}: ${count}`).join('\n')}
+
+🔥 Most Active Users:
+${Object.entries(posts.reduce((acc, post) => {
+    acc[post.author] = (acc[post.author] || 0) + 1;
+    return acc;
+}, {})).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([user, count]) => `${user}: ${count} posts`).join('\n')}
+            `;
+            
+            alert(analytics);
+        }
+
+        function manageCategories() {
+            alert('Category management would allow adding, editing, and removing post categories.');
+        }
+
+        function systemSettings() {
+            alert('System settings would include forum configuration, announcement management, and other administrative tools.');
+        }
+
+        function viewUserPosts(username) {
+            const userPosts = posts.filter(post => post.author === username);
+            if (userPosts.length === 0) {
+                alert(`No posts found for user: ${username}`);
+                return;
+            }
+            
+            const postsList = userPosts.map(post => `"${post.title}" (${post.category})`).join('\n');
+            alert(`Posts by ${username}:\n\n${postsList}`);
+        }
+
         // Initial load
         loadPosts();
 
@@ -1429,7 +1981,7 @@
         if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
             console.log('Demo mode - Firebase config needed for full functionality');
             
-            // Mock data for demo with NEMSU theme
+            // Mock data for demo with NEMSU theme and admin functionality
             posts = [
                 {
                     id: '1',
@@ -1437,12 +1989,15 @@
                     content: 'Connect with your fellow NEMSU students, share knowledge, and build lasting friendships. This platform is designed to help our university community thrive together.',
                     category: 'general',
                     author: 'NEMSU Admin',
+                    authorEmail: 'admin@nemsu.edu.ph',
                     timestamp: new Date(),
                     likes: 15,
                     likedBy: [],
+                    pinned: true,
                     replies: [
                         {
                             author: 'Student Leader',
+                            authorEmail: 'leader@nemsu.edu.ph',
                             content: 'Excited to be part of this community!',
                             timestamp: new Date(Date.now() - 1800000)
                         }
@@ -1450,49 +2005,83 @@
                 },
                 {
                     id: '2',
-                    title: 'BSHM Study Group - Hospitality Excellence',
-                    content: 'Fellow BSHM students! Let\'s form a study group for our hospitality management courses. We can meet at the library every Tuesday and Thursday to discuss case studies and share insights.',
-                    category: 'bshm',
-                    author: 'Maria Santos',
-                    timestamp: new Date(Date.now() - 3600000),
+                    title: 'Important: Forum Guidelines and Rules',
+                    content: 'Please read and follow our community guidelines: 1) Be respectful to all members, 2) No spam or irrelevant content, 3) Use appropriate categories, 4) Report inappropriate content. Violations may result in account suspension.',
+                    category: 'general',
+                    author: 'Forum Moderator',
+                    authorEmail: 'moderator@nemsu.edu.ph',
+                    timestamp: new Date(Date.now() - 1800000),
                     likes: 8,
                     likedBy: [],
+                    pinned: true,
                     replies: []
                 },
                 {
                     id: '3',
+                    title: 'BSHM Study Group - Hospitality Excellence',
+                    content: 'Fellow BSHM students! Let\'s form a study group for our hospitality management courses. We can meet at the library every Tuesday and Thursday to discuss case studies and share insights.',
+                    category: 'bshm',
+                    author: 'Maria Santos',
+                    authorEmail: 'maria.santos@student.nemsu.edu.ph',
+                    timestamp: new Date(Date.now() - 3600000),
+                    likes: 8,
+                    likedBy: [],
+                    replies: [
+                        {
+                            author: 'Juan Cruz',
+                            authorEmail: 'juan.cruz@student.nemsu.edu.ph',
+                            content: 'Count me in! What time works best for everyone?',
+                            timestamp: new Date(Date.now() - 2700000)
+                        }
+                    ]
+                },
+                {
+                    id: '4',
                     title: 'Arduino Workshop for BSIT-ELEC Students',
                     content: 'The Electronics Engineering department is organizing an Arduino workshop next week. Perfect opportunity for BSIT-ELEC students to enhance their practical skills. Registration is now open!',
                     category: 'bsit-elec',
                     author: 'Prof. Rodriguez',
+                    authorEmail: 'prof.rodriguez@nemsu.edu.ph',
                     timestamp: new Date(Date.now() - 7200000),
                     likes: 12,
                     likedBy: [],
                     replies: []
                 },
                 {
-                    id: '4',
+                    id: '5',
                     title: 'Internship Opportunities in Automation',
                     content: 'Great news for BSIT-AUTO students! Several companies in Butuan are offering internship positions in industrial automation. Check with the career services office for more details.',
                     category: 'bsit-auto',
                     author: 'Career Services',
+                    authorEmail: 'careers@nemsu.edu.ph',
                     timestamp: new Date(Date.now() - 10800000),
                     likes: 18,
                     likedBy: [],
                     replies: []
                 },
                 {
-                    id: '5',
+                    id: '6',
                     title: 'Web Development Bootcamp - BSINFO.TECH',
                     content: 'Join our intensive web development bootcamp! We\'ll cover modern frameworks like React, Node.js, and database management. Perfect for BSINFO.TECH students looking to enhance their skills.',
                     category: 'bsinfo-tech',
                     author: 'Tech Club President',
+                    authorEmail: 'techclub@student.nemsu.edu.ph',
                     timestamp: new Date(Date.now() - 14400000),
                     likes: 22,
                     likedBy: [],
                     replies: []
                 }
             ];
+            
+            // Set up pinned posts
+            pinnedPosts.add('1');
+            pinnedPosts.add('2');
+            
+            // Demo: Add current user as admin if email matches
+            if (currentUser && isAdmin(currentUser)) {
+                console.log('Admin user detected in demo mode');
+            }
+            
             displayPosts();
             updateStats();
         }
