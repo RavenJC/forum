@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Forum</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #1e3a8a, #1e40af);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #1e3a8a;
+            color: #1e3a8a;
+        }
+
+        .btn-secondary:hover {
+            background: #1e3a8a;
+            color: white;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        .forum-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+
+        .post-form {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .posts-container {
+            space-y: 20px;
+        }
+
+        .post {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid #1e3a8a;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .post-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .post-meta {
+            color: #666;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .post-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .author-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .post-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .action-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .auth-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .auth-modal h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .category-filter {
+            margin-bottom: 20px;
+        }
+
+        .category-btn {
+            background: transparent;
+            border: 2px solid #e1e5e9;
+            color: #666;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .stats-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #c33;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .auth-section {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">🎓 Student Forum</div>
+            <div class="auth-section">
+                <div id="userSection" class="hidden">
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar"></div>
+                        <span id="userName"></span>
+                    </div>
+                    <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
+                </div>
+                <div id="guestSection">
+                    <button class="btn" onclick="showAuthModal('login')">Login</button>
+                    <button class="btn btn-secondary" onclick="showAuthModal('register')">Register</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="forum-section">
+                <div class="category-filter">
+                    <button class="category-btn active" onclick="filterPosts('all')">All Posts</button>
+                    <button class="category-btn" onclick="filterPosts('general')">General</button>
+                    <button class="category-btn" onclick="filterPosts('study')">Study Help</button>
+                    <button class="category-btn" onclick="filterPosts('events')">Events</button>
+                    <button class="category-btn" onclick="filterPosts('jobs')">Jobs</button>
+                </div>
+
+                <div id="postForm" class="post-form hidden">
+                    <h3>Create a New Post</h3>
+                    <div class="form-group">
+                        <label for="postTitle">Title</label>
+                        <input type="text" id="postTitle" class="form-control" placeholder="Enter post title...">
+                    </div>
+                    <div class="form-group">
+                        <label for="postCategory">Category</label>
+                        <select id="postCategory" class="form-control">
+                            <option value="general">General</option>
+                            <option value="study">Study Help</option>
+                            <option value="events">Events</option>
+                            <option value="jobs">Jobs</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="postContent">Content</label>
+                        <textarea id="postContent" class="form-control" placeholder="Share your thoughts..."></textarea>
+                    </div>
+                    <button class="btn" onclick="createPost()">Post</button>
+                </div>
+
+                <div id="postsContainer" class="posts-container">
+                    <div class="loading">Loading posts...</div>
+                </div>
+            </div>
+
+            <aside class="sidebar">
+                <div class="stats-card">
+                    <div class="stats-number" id="totalPosts">0</div>
+                    <div class="stats-label">Total Posts</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number" id="totalUsers">0</div>
+                    <div class="stats-label">Active Users</div>
+                </div>
+                
+                <h3>Recent Activity</h3>
+                <div id="recentActivity">
+                    <p>Welcome to the Student Forum! Sign in to start participating.</p>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="authModal" class="auth-modal hidden">
+        <div class="auth-modal-content">
+            <h2 id="authTitle">Login</h2>
+            <div id="authError" class="error hidden"></div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input type="email" id="authEmail" class="form-control" placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" class="form-control" placeholder="Enter your password">
+            </div>
+            <div id="registerFields" class="hidden">
+                <div class="form-group">
+                    <label for="authDisplayName">Display Name</label>
+                    <input type="text" id="authDisplayName" class="form-control" placeholder="Enter your display name">
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn" id="authSubmit" onclick="handleAuth()">Login</button>
+                <button class="btn btn-secondary" onclick="hideAuthModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration (replace with your actual config)
+	const firebaseConfig = {
+  	apiKey: "AIzaSyBgNuWFTCB5fb1q4WMXLHeORnIOO5VJnzY",
+  	authDomain: "forum-e7d82.firebaseapp.com",
+  	projectId: "forum-e7d82",
+ 	 storageBucket: "forum-e7d82.firebasestorage.app",
+ 	 messagingSenderId: "981123692929",
+ 	 appId: "1:981123692929:web:31fb637d6e61dff30c5080"
+	};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let currentFilter = 'all';
+        let posts = [];
+
+        // Auth state observer
+        auth.onAuthStateChanged((user) => {
+            currentUser = user;
+            updateAuthUI();
+            if (user) {
+                loadPosts();
+            }
+        });
+
+        function updateAuthUI() {
+            const userSection = document.getElementById('userSection');
+            const guestSection = document.getElementById('guestSection');
+            const postForm = document.getElementById('postForm');
+            
+            if (currentUser) {
+                userSection.classList.remove('hidden');
+                guestSection.classList.add('hidden');
+                postForm.classList.remove('hidden');
+                
+                document.getElementById('userName').textContent = currentUser.displayName || currentUser.email;
+                document.getElementById('userAvatar').textContent = (currentUser.displayName || currentUser.email)[0].toUpperCase();
+            } else {
+                userSection.classList.add('hidden');
+                guestSection.classList.remove('hidden');
+                postForm.classList.add('hidden');
+            }
+        }
+
+        function showAuthModal(mode) {
+            const modal = document.getElementById('authModal');
+            const title = document.getElementById('authTitle');
+            const submitBtn = document.getElementById('authSubmit');
+            const registerFields = document.getElementById('registerFields');
+            
+            if (mode === 'register') {
+                title.textContent = 'Register';
+                submitBtn.textContent = 'Register';
+                registerFields.classList.remove('hidden');
+            } else {
+                title.textContent = 'Login';
+                submitBtn.textContent = 'Login';
+                registerFields.classList.add('hidden');
+            }
+            
+            modal.classList.remove('hidden');
+            document.getElementById('authError').classList.add('hidden');
+        }
+
+        function hideAuthModal() {
+            document.getElementById('authModal').classList.add('hidden');
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPassword').value = '';
+            document.getElementById('authDisplayName').value = '';
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const displayName = document.getElementById('authDisplayName').value;
+            const isRegister = document.getElementById('authTitle').textContent === 'Register';
+            const errorDiv = document.getElementById('authError');
+
+            try {
+                if (isRegister) {
+                    const result = await auth.createUserWithEmailAndPassword(email, password);
+                    if (displayName) {
+                        await result.user.updateProfile({ displayName: displayName });
+                    }
+                } else {
+                    await auth.signInWithEmailAndPassword(email, password);
+                }
+                hideAuthModal();
+            } catch (error) {
+                errorDiv.textContent = error.message;
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function signOut() {
+            auth.signOut();
+        }
+
+        async function createPost() {
+            if (!currentUser) return;
+
+            const title = document.getElementById('postTitle').value;
+            const content = document.getElementById('postContent').value;
+            const category = document.getElementById('postCategory').value;
+
+            if (!title.trim() || !content.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            try {
+                await db.collection('posts').add({
+                    title: title,
+                    content: content,
+                    category: category,
+                    author: currentUser.displayName || currentUser.email,
+                    authorId: currentUser.uid,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    likes: 0,
+                    likedBy: []
+                });
+
+                document.getElementById('postTitle').value = '';
+                document.getElementById('postContent').value = '';
+                loadPosts();
+            } catch (error) {
+                console.error('Error creating post:', error);
+                alert('Error creating post. Please try again.');
+            }
+        }
+
+        async function loadPosts() {
+            try {
+                const snapshot = await db.collection('posts')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+
+                posts = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                displayPosts();
+                updateStats();
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('postsContainer').innerHTML = 
+                    '<div class="error">Error loading posts. Please refresh the page.</div>';
+            }
+        }
+
+        function displayPosts() {
+            const container = document.getElementById('postsContainer');
+            const filteredPosts = currentFilter === 'all' ? posts : posts.filter(post => post.category === currentFilter);
+
+            if (filteredPosts.length === 0) {
+                container.innerHTML = '<div class="loading">No posts found in this category.</div>';
+                return;
+            }
+
+            container.innerHTML = filteredPosts.map(post => `
+                <div class="post">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-title">${escapeHtml(post.title)}</div>
+                            <div class="post-meta">
+                                <div class="post-author">
+                                    <div class="author-avatar">${(post.author || 'A')[0].toUpperCase()}</div>
+                                    <span>${escapeHtml(post.author || 'Anonymous')}</span>
+                                </div>
+                                <span>•</span>
+                                <span>${formatDate(post.timestamp)}</span>
+                                <span class="category-tag">#${post.category}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
+                    <div class="post-actions">
+                        <button class="action-btn" onclick="likePost('${post.id}')">
+                            👍 ${post.likes || 0}
+                        </button>
+                        <button class="action-btn">
+                            💬 Reply
+                        </button>
+                        <button class="action-btn">
+                            🔗 Share
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterPosts(category) {
+            currentFilter = category;
+            
+            // Update active button
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            displayPosts();
+        }
+
+        async function likePost(postId) {
+            if (!currentUser) {
+                alert('Please log in to like posts');
+                return;
+            }
+
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                await db.runTransaction(async (transaction) => {
+                    const doc = await transaction.get(postRef);
+                    if (!doc.exists) throw new Error('Post does not exist');
+                    
+                    const data = doc.data();
+                    const likedBy = data.likedBy || [];
+                    const currentLikes = data.likes || 0;
+                    
+                    if (likedBy.includes(currentUser.uid)) {
+                        // Unlike
+                        transaction.update(postRef, {
+                            likes: currentLikes - 1,
+                            likedBy: firebase.firestore.FieldValue.arrayRemove(currentUser.uid)
+                        });
+                    } else {
+                        // Like
+                        transaction.update(postRef, {
+                            likes: currentLikes + 1,
+                            likedBy: firebase.firestore.FieldValue.arrayUnion(currentUser.uid)
+                        });
+                    }
+                });
+                
+                loadPosts();
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalPosts').textContent = posts.length;
+        }
+
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Just now';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Initial load
+        loadPosts();
+
+        // Add some demo data if running locally
+        if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+            console.log('Demo mode - Firebase config needed for full functionality');
+            
+            // Mock data for demo
+            posts = [
+                {
+                    id: '1',
+                    title: 'Welcome to the Student Forum!',
+                    content: 'This is a demo post. To use this forum with real data, you\'ll need to set up Firebase authentication and Firestore.',
+                    category: 'general',
+                    author: 'Admin',
+                    timestamp: new Date(),
+                    likes: 5
+                },
+                {
+                    id: '2',
+                    title: 'Study Group for Mathematics',
+                    content: 'Looking for students interested in forming a study group for advanced mathematics. We meet every Tuesday and Thursday.',
+                    category: 'study',
+                    author: 'Math Student',
+                    timestamp: new Date(Date.now() - 3600000),
+                    likes: 3
+                }
+            ];
+            displayPosts();
+            updateStats();
+        }
+    </script>
+</body>
+</html>
