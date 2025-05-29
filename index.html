@@ -3,206 +3,431 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Forum</title>
+    <title>Student Forum - Connect & Learn</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --glass-bg: rgba(255, 255, 255, 0.25);
+            --glass-border: rgba(255, 255, 255, 0.18);
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-light: #718096;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #3b82f6 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background-attachment: fixed;
             min-height: 100vh;
-            color: #333;
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
         }
 
         .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .logo {
-            font-size: 2rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo::before {
+            content: '🎓';
+            font-size: 2.5rem;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         .auth-section {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             align-items: center;
+            position: relative;
+            z-index: 1;
         }
 
         .user-info {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            background: var(--primary-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-avatar::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: avatarShine 2s infinite;
+        }
+
+        @keyframes avatarShine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .btn {
-            background: linear-gradient(45deg, #1e3a8a, #1e40af);
+            background: var(--primary-gradient);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 12px 24px;
+            border-radius: 50px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            font-weight: 600;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn-secondary {
             background: transparent;
-            border: 2px solid #1e3a8a;
-            color: #1e3a8a;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            backdrop-filter: blur(10px);
         }
 
         .btn-secondary:hover {
-            background: #1e3a8a;
-            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.8);
         }
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 30px;
+            grid-template-columns: 1fr 320px;
+            gap: 32px;
         }
 
         .forum-section {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+            position: relative;
+            overflow: hidden;
         }
 
         .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
             height: fit-content;
+            position: sticky;
+            top: 20px;
         }
 
         .post-form {
-            margin-bottom: 30px;
-            padding: 25px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
+            margin-bottom: 32px;
+            padding: 28px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.2) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post-form::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-gradient);
+            border-radius: 20px 20px 0 0;
+        }
+
+        .post-form h3 {
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            font-size: 1.4rem;
+            font-weight: 700;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-primary);
+            font-size: 14px;
         }
 
         .form-control {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
+            padding: 14px 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
             font-size: 14px;
-            transition: border-color 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            color: var(--text-primary);
         }
 
         .form-control:focus {
             outline: none;
-            border-color: #1e3a8a;
-            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .form-control::placeholder {
+            color: var(--text-light);
         }
 
         textarea.form-control {
             resize: vertical;
-            min-height: 100px;
+            min-height: 120px;
+        }
+
+        .category-filter {
+            margin-bottom: 28px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .category-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .category-btn:hover::before {
+            left: 100%;
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .category-btn.active {
+            background: var(--primary-gradient);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .posts-container {
-            space-y: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
         }
 
         .post {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid #1e3a8a;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%);
+            border-radius: 20px;
+            padding: 28px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .post:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .post:hover::before {
+            opacity: 1;
         }
 
         .post-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            align-items: flex-start;
+            margin-bottom: 16px;
         }
 
         .post-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
         }
 
         .post-meta {
-            color: #666;
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            flex-wrap: wrap;
         }
 
         .post-author {
@@ -212,146 +437,137 @@
         }
 
         .author-avatar {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #1e3a8a, #fbbf24);
+            background: var(--primary-gradient);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
+        .category-tag {
+            background: var(--success-gradient);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .category-tag.bshm { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+        .category-tag.bsit-auto { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+        .category-tag.bsit-elec { background: linear-gradient(135deg, #ffa726, #fb8c00); }
+        .category-tag.bsinfo-tech { background: linear-gradient(135deg, #ab47bc, #8e24aa); }
+        .category-tag.general { background: linear-gradient(135deg, #5c6bc0, #3f51b5); }
+        .category-tag.study { background: linear-gradient(135deg, #26a69a, #00695c); }
+        .category-tag.events { background: linear-gradient(135deg, #ef5350, #d32f2f); }
+        .category-tag.jobs { background: linear-gradient(135deg, #66bb6a, #43a047); }
+
         .post-content {
-            color: #555;
+            color: var(--text-secondary);
             line-height: 1.6;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-size: 15px;
         }
 
         .post-actions {
             display: flex;
-            gap: 15px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
-            background: none;
+            background: transparent;
             border: none;
-            color: #1e3a8a;
+            color: var(--text-light);
             cursor: pointer;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
+            backdrop-filter: blur(10px);
         }
 
         .action-btn:hover {
-            background: rgba(30, 58, 138, 0.1);
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            transform: translateY(-1px);
         }
 
-        .action-btn.liked {
-            background: rgba(30, 58, 138, 0.1);
-            color: #1e3a8a;
-            font-weight: bold;
-        }
-
-        .replies-section {
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #e1e5e9;
-        }
-
-        .reply-form {
-            margin-bottom: 20px;
-        }
-
-        .replies-list {
-            space-y: 15px;
-        }
-
-        .reply {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 3px solid #1e3a8a;
-        }
-
-        .reply-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .reply-author {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .reply-time {
-            font-size: 0.8rem;
-            color: #666;
-        }
-
-        .reply-content {
-            color: #555;
-            line-height: 1.5;
-        }
-
-        .share-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .share-modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        .share-options {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin: 20px 0;
-        }
-
-        .share-btn {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-        }
-
-        .share-btn.copy {
-            background: #10b981;
+        .stats-card {
+            background: var(--primary-gradient);
             color: white;
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
-        .share-btn.copy:hover {
-            background: #059669;
+        .stats-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: rotate 3s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-number {
+            font-size: 2.4rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .recent-activity {
+            margin-top: 24px;
+        }
+
+        .recent-activity h3 {
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .activity-item {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border-left: 3px solid var(--primary-gradient);
         }
 
         .auth-modal {
@@ -360,102 +576,141 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .auth-modal-content {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
             padding: 40px;
-            border-radius: 20px;
+            border-radius: 24px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
+            max-width: 420px;
             width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .auth-modal h2 {
             text-align: center;
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .category-filter {
-            margin-bottom: 20px;
-        }
-
-        .category-btn {
-            background: transparent;
-            border: 2px solid #e1e5e9;
-            color: #666;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .category-btn.active {
-            background: #1e3a8a;
-            border-color: #1e3a8a;
-            color: white;
-        }
-
-        .stats-card {
-            background: linear-gradient(135deg, #1e3a8a, #fbbf24);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .stats-number {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .stats-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            margin-bottom: 32px;
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 1.6rem;
         }
 
         .loading {
             text-align: center;
-            padding: 40px;
-            color: #666;
+            padding: 60px 20px;
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .loading::before {
+            content: '⏳';
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 12px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .error {
-            background: #fee;
+            background: linear-gradient(135deg, #fee, #fdd);
             color: #c33;
-            padding: 15px;
-            border-radius: 10px;
+            padding: 16px 20px;
+            border-radius: 12px;
             margin-bottom: 20px;
             border-left: 4px solid #c33;
+            font-size: 14px;
         }
 
-        @media (max-width: 768px) {
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
             .main-content {
                 grid-template-columns: 1fr;
             }
             
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
             .header {
                 flex-direction: column;
-                gap: 15px;
+                gap: 20px;
                 text-align: center;
+                padding: 20px;
             }
             
             .auth-section {
                 flex-direction: column;
+                gap: 12px;
+            }
+            
+            .category-filter {
+                justify-content: center;
+            }
+            
+            .forum-section, .sidebar {
+                padding: 20px;
+            }
+            
+            .post {
+                padding: 20px;
+            }
+            
+            .logo {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .category-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .category-btn {
+                text-align: center;
+            }
+            
+            .post-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-btn {
+                justify-content: center;
             }
         }
     </style>
@@ -463,7 +718,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <div class="logo">🎓 Student Forum</div>
+            <div class="logo">Student Forum</div>
             <div class="auth-section">
                 <div id="userSection" class="hidden">
                     <div class="user-info">
@@ -473,8 +728,8 @@
                     <button class="btn btn-secondary" onclick="signOut()">Sign Out</button>
                 </div>
                 <div id="guestSection">
-                    <button class="btn" onclick="showAuthModal('login')">Login</button>
-                    <button class="btn btn-secondary" onclick="showAuthModal('register')">Register</button>
+                    <button class="btn" onclick="showAuthModal('login')">✨ Login</button>
+                    <button class="btn btn-secondary" onclick="showAuthModal('register')">🚀 Register</button>
                 </div>
             </div>
         </header>
@@ -482,53 +737,69 @@
         <main class="main-content">
             <div class="forum-section">
                 <div class="category-filter">
-                    <button class="category-btn active" onclick="filterPosts('all')">All Posts</button>
-                    <button class="category-btn" onclick="filterPosts('general')">General</button>
-                    <button class="category-btn" onclick="filterPosts('study')">Study Help</button>
-                    <button class="category-btn" onclick="filterPosts('events')">Events</button>
-                    <button class="category-btn" onclick="filterPosts('jobs')">Jobs</button>
+                    <button class="category-btn active" onclick="filterPosts('all')">🌟 All Posts</button>
+                    <button class="category-btn" onclick="filterPosts('general')">💬 General</button>
+                    <button class="category-btn" onclick="filterPosts('study')">📚 Study Help</button>
+                    <button class="category-btn" onclick="filterPosts('events')">🎉 Events</button>
+                    <button class="category-btn" onclick="filterPosts('jobs')">💼 Jobs</button>
+                    <button class="category-btn" onclick="filterPosts('bshm')">🏨 BSHM</button>
+                    <button class="category-btn" onclick="filterPosts('bsit-auto')">🤖 BSIT-AUTO</button>
+                    <button class="category-btn" onclick="filterPosts('bsit-elec')">⚡ BSIT-ELEC</button>
+                    <button class="category-btn" onclick="filterPosts('bsinfo-tech')">💻 BSINFO.TECH</button>
                 </div>
 
                 <div id="postForm" class="post-form hidden">
-                    <h3>Create a New Post</h3>
+                    <h3>✨ Create a New Post</h3>
                     <div class="form-group">
-                        <label for="postTitle">Title</label>
-                        <input type="text" id="postTitle" class="form-control" placeholder="Enter post title...">
+                        <label for="postTitle">📝 Title</label>
+                        <input type="text" id="postTitle" class="form-control" placeholder="What's on your mind?">
                     </div>
                     <div class="form-group">
-                        <label for="postCategory">Category</label>
+                        <label for="postCategory">🏷️ Category</label>
                         <select id="postCategory" class="form-control">
-                            <option value="general">General</option>
-                            <option value="study">Study Help</option>
-                            <option value="events">Events</option>
-                            <option value="jobs">Jobs</option>
+                            <option value="general">💬 General Discussion</option>
+                            <option value="study">📚 Study Help</option>
+                            <option value="events">🎉 Events & Activities</option>
+                            <option value="jobs">💼 Job Opportunities</option>
+                            <option value="bshm">🏨 BSHM - Hotel Management</option>
+                            <option value="bsit-auto">🤖 BSIT - Automation</option>
+                            <option value="bsit-elec">⚡ BSIT - Electronics</option>
+                            <option value="bsinfo-tech">💻 BS Information Technology</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="postContent">Content</label>
-                        <textarea id="postContent" class="form-control" placeholder="Share your thoughts..."></textarea>
+                        <label for="postContent">✍️ Content</label>
+                        <textarea id="postContent" class="form-control" placeholder="Share your thoughts, questions, or ideas..."></textarea>
                     </div>
-                    <button class="btn" onclick="createPost()">Post</button>
+                    <button class="btn" onclick="createPost()">🚀 Post Now</button>
                 </div>
 
                 <div id="postsContainer" class="posts-container">
-                    <div class="loading">Loading posts...</div>
+                    <div class="loading">Loading amazing posts...</div>
                 </div>
             </div>
 
             <aside class="sidebar">
                 <div class="stats-card">
                     <div class="stats-number" id="totalPosts">0</div>
-                    <div class="stats-label">Total Posts</div>
+                    <div class="stats-label">📝 Total Posts</div>
                 </div>
-                <div class="stats-card">
+                <div class="stats-card" style="background: var(--secondary-gradient);">
                     <div class="stats-number" id="totalUsers">0</div>
-                    <div class="stats-label">Active Users</div>
+                    <div class="stats-label">👥 Active Users</div>
+                </div>
+                <div class="stats-card" style="background: var(--success-gradient);">
+                    <div class="stats-number" id="onlineUsers">12</div>
+                    <div class="stats-label">🌐 Online Now</div>
                 </div>
                 
-                <h3>Recent Activity</h3>
-                <div id="recentActivity">
-                    <p>Welcome to the Student Forum! Sign in to start participating.</p>
+                <div class="recent-activity">
+                    <h3>🔥 Recent Activity</h3>
+                    <div id="recentActivity">
+                        <div class="activity-item">Welcome to our enhanced Student Forum! 🎉</div>
+                        <div class="activity-item">Join your program category to connect with peers! 👥</div>
+                        <div class="activity-item">Share knowledge and grow together! 🌱</div>
+                    </div>
                 </div>
             </aside>
         </main>
@@ -537,59 +808,39 @@
     <!-- Auth Modal -->
     <div id="authModal" class="auth-modal hidden">
         <div class="auth-modal-content">
-            <h2 id="authTitle">Login</h2>
+            <h2 id="authTitle">🔐 Login</h2>
             <div id="authError" class="error hidden"></div>
             <div class="form-group">
-                <label for="authEmail">Email</label>
-                <input type="email" id="authEmail" class="form-control" placeholder="Enter your email">
+                <label for="authEmail">📧 Email</label>
+                <input type="email" id="authEmail" class="form-control" placeholder="Enter your email address">
             </div>
             <div class="form-group">
-                <label for="authPassword">Password</label>
+                <label for="authPassword">🔒 Password</label>
                 <input type="password" id="authPassword" class="form-control" placeholder="Enter your password">
             </div>
             <div id="registerFields" class="hidden">
                 <div class="form-group">
-                    <label for="authDisplayName">Display Name</label>
-                    <input type="text" id="authDisplayName" class="form-control" placeholder="Enter your display name">
+                    <label for="authDisplayName">👤 Display Name</label>
+                    <input type="text" id="authDisplayName" class="form-control" placeholder="How should we call you?">
                 </div>
             </div>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button class="btn" id="authSubmit" onclick="handleAuth()">Login</button>
-                <button class="btn btn-secondary" onclick="hideAuthModal()">Cancel</button>
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button class="btn" id="authSubmit" onclick="handleAuth()">🚀 Login</button>
+                <button class="btn btn-secondary" onclick="hideAuthModal()">❌ Cancel</button>
             </div>
-        </div>
-    </div>
-
-    <!-- Share Modal -->
-    <div id="shareModal" class="share-modal hidden">
-        <div class="share-modal-content">
-            <h3>Share This Post</h3>
-            <p id="sharePostTitle"></p>
-            <div class="share-options">
-                <button class="share-btn copy" onclick="copyPostLink()">
-                    📋 Copy Link
-                </button>
-                <button class="share-btn" onclick="shareToSocial('twitter')">
-                    🐦 Twitter
-                </button>
-                <button class="share-btn" onclick="shareToSocial('facebook')">
-                    📘 Facebook
-                </button>
-            </div>
-            <button class="btn btn-secondary" onclick="hideShareModal()">Close</button>
         </div>
     </div>
 
     <script>
         // Firebase configuration (replace with your actual config)
-	const firebaseConfig = {
-	  apiKey: "AIzaSyBgNuWFTCB5fb1q4WMXLHeORnIOO5VJnzY",
-	  authDomain: "forum-e7d82.firebaseapp.com",
-	  projectId: "forum-e7d82",
-	  storageBucket: "forum-e7d82.firebasestorage.app",
-	  messagingSenderId: "981123692929",
-	  appId: "1:981123692929:web:31fb637d6e61dff30c5080"
-	};
+        const firebaseConfig = {
+            apiKey: "AIzaSyBgNuWFTCB5fb1q4WMXLHeORnIOO5VJnzY",
+            authDomain: "forum-e7d82.firebaseapp.com",
+            projectId: "forum-e7d82",
+            storageBucket: "forum-e7d82.firebasestorage.app",
+            messagingSenderId: "981123692929",
+            appId: "1:981123692929:web:31fb637d6e61dff30c5080"
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -599,7 +850,6 @@
         let currentUser = null;
         let currentFilter = 'all';
         let posts = [];
-        let currentSharePostId = null;
 
         // Auth state observer
         auth.onAuthStateChanged((user) => {
@@ -636,12 +886,12 @@
             const registerFields = document.getElementById('registerFields');
             
             if (mode === 'register') {
-                title.textContent = 'Register';
-                submitBtn.textContent = 'Register';
+                title.textContent = '🚀 Register';
+                submitBtn.textContent = '🚀 Register';
                 registerFields.classList.remove('hidden');
             } else {
-                title.textContent = 'Login';
-                submitBtn.textContent = 'Login';
+                title.textContent = '🔐 Login';
+                submitBtn.textContent = '🚀 Login';
                 registerFields.classList.add('hidden');
             }
             
@@ -660,7 +910,7 @@
             const email = document.getElementById('authEmail').value;
             const password = document.getElementById('authPassword').value;
             const displayName = document.getElementById('authDisplayName').value;
-            const isRegister = document.getElementById('authTitle').textContent === 'Register';
+            const isRegister = document.getElementById('authTitle').textContent.includes('Register');
             const errorDiv = document.getElementById('authError');
 
             try {
@@ -704,8 +954,7 @@
                     authorId: currentUser.uid,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
-                    likedBy: [],
-                    replies: []
+                    likedBy: []
                 });
 
                 document.getElementById('postTitle').value = '';
@@ -737,121 +986,17 @@
             }
         }
 
-        function toggleReplies(postId) {
-            const repliesSection = document.getElementById(`replies-${postId}`);
-            repliesSection.classList.toggle('hidden');
-        }
-
-        async function addReply(postId) {
-            if (!currentUser) {
-                alert('Please log in to reply');
-                return;
-            }
-
-            const replyInput = document.getElementById(`reply-input-${postId}`);
-            const content = replyInput.value.trim();
-
-            if (!content) {
-                alert('Please enter a reply');
-                return;
-            }
-
-            try {
-                const postRef = db.collection('posts').doc(postId);
-                const newReply = {
-                    content: content,
-                    author: currentUser.displayName || currentUser.email,
-                    authorId: currentUser.uid,
-                    timestamp: new Date()
-                };
-
-                await postRef.update({
-                    replies: firebase.firestore.FieldValue.arrayUnion(newReply)
-                });
-
-                replyInput.value = '';
-                loadPosts();
-            } catch (error) {
-                console.error('Error adding reply:', error);
-                alert('Error adding reply. Please try again.');
-            }
-        }
-
-        function sharePost(postId, title) {
-            currentSharePostId = postId;
-            document.getElementById('sharePostTitle').textContent = title;
-            document.getElementById('shareModal').classList.remove('hidden');
-        }
-
-        function hideShareModal() {
-            document.getElementById('shareModal').classList.add('hidden');
-            currentSharePostId = null;
-        }
-
-        function copyPostLink() {
-            const postUrl = `${window.location.origin}${window.location.pathname}#post-${currentSharePostId}`;
-            
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(postUrl).then(() => {
-                    alert('Link copied to clipboard!');
-                    hideShareModal();
-                }).catch(() => {
-                    fallbackCopyText(postUrl);
-                });
-            } else {
-                fallbackCopyText(postUrl);
-            }
-        }
-
-        function fallbackCopyText(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                alert('Link copied to clipboard!');
-                hideShareModal();
-            } catch (err) {
-                alert('Unable to copy link. Please copy manually: ' + text);
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function shareToSocial(platform) {
-            const post = posts.find(p => p.id === currentSharePostId);
-            const postUrl = `${window.location.origin}${window.location.pathname}#post-${currentSharePostId}`;
-            const text = `Check out this post: "${post.title}"`;
-            
-            let shareUrl;
-            
-            switch(platform) {
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(postUrl)}`;
-                    break;
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
-                    break;
-                default:
-                    return;
-            }
-            
-            window.open(shareUrl, '_blank', 'width=600,height=400');
-            hideShareModal();
-        }
-
         function displayPosts() {
             const container = document.getElementById('postsContainer');
             const filteredPosts = currentFilter === 'all' ? posts : posts.filter(post => post.category === currentFilter);
 
             if (filteredPosts.length === 0) {
-                container.innerHTML = '<div class="loading">No posts found in this category.</div>';
+                container.innerHTML = '<div class="loading">No posts found in this category. Be the first to post! 🚀</div>';
                 return;
             }
 
             container.innerHTML = filteredPosts.map(post => `
-                <div class="post" id="post-${post.id}">
+                <div class="post">
                     <div class="post-header">
                         <div>
                             <div class="post-title">${escapeHtml(post.title)}</div>
@@ -862,44 +1007,42 @@
                                 </div>
                                 <span>•</span>
                                 <span>${formatDate(post.timestamp)}</span>
-                                <span class="category-tag">#${post.category}</span>
+                                <span class="category-tag ${post.category}">${getCategoryDisplay(post.category)}</span>
                             </div>
                         </div>
                     </div>
                     <div class="post-content">${escapeHtml(post.content)}</div>
                     <div class="post-actions">
-                        <button class="action-btn ${post.likedBy && currentUser && post.likedBy.includes(currentUser.uid) ? 'liked' : ''}" onclick="likePost('${post.id}')">
-                            👍 ${post.likes || 0}
+                        <button class="action-btn" onclick="likePost('${post.id}')">
+                            👍 ${post.likes || 0} Likes
                         </button>
-                        <button class="action-btn" onclick="toggleReplies('${post.id}')">
-                            💬 ${(post.replies || []).length} ${(post.replies || []).length === 1 ? 'Reply' : 'Replies'}
+                        <button class="action-btn">
+                            💬 Reply
                         </button>
-                        <button class="action-btn" onclick="sharePost('${post.id}', '${escapeHtml(post.title).replace(/'/g, "\\'")}')">
+                        <button class="action-btn">
                             🔗 Share
                         </button>
-                    </div>
-                    <div id="replies-${post.id}" class="replies-section hidden">
-                        ${currentUser ? `
-                            <div class="reply-form">
-                                <textarea id="reply-input-${post.id}" class="form-control" placeholder="Write a reply..." rows="3"></textarea>
-                                <button class="btn" onclick="addReply('${post.id}')" style="margin-top: 10px;">Post Reply</button>
-                            </div>
-                        ` : '<p style="text-align: center; color: #666; margin: 15px 0;">Please log in to reply</p>'}
-                        <div id="replies-list-${post.id}" class="replies-list">
-                            ${(post.replies || []).map(reply => `
-                                <div class="reply">
-                                    <div class="reply-header">
-                                        <div class="author-avatar">${(reply.author || 'A')[0].toUpperCase()}</div>
-                                        <span class="reply-author">${escapeHtml(reply.author || 'Anonymous')}</span>
-                                        <span class="reply-time">${formatDate(reply.timestamp)}</span>
-                                    </div>
-                                    <div class="reply-content">${escapeHtml(reply.content)}</div>
-                                </div>
-                            `).join('')}
-                        </div>
+                        <button class="action-btn">
+                            🔖 Save
+                        </button>
                     </div>
                 </div>
             `).join('');
+        }
+
+        function getCategoryDisplay(category) {
+            const categoryMap = {
+                'all': '🌟 All',
+                'general': '💬 General',
+                'study': '📚 Study',
+                'events': '🎉 Events',
+                'jobs': '💼 Jobs',
+                'bshm': '🏨 BSHM',
+                'bsit-auto': '🤖 AUTO',
+                'bsit-elec': '⚡ ELEC',
+                'bsinfo-tech': '💻 INFO.TECH'
+            };
+            return categoryMap[category] || category.toUpperCase();
         }
 
         function filterPosts(category) {
@@ -953,12 +1096,24 @@
 
         function updateStats() {
             document.getElementById('totalPosts').textContent = posts.length;
+            // Simulate user count
+            document.getElementById('totalUsers').textContent = Math.max(15, posts.length * 2);
         }
 
         function formatDate(timestamp) {
             if (!timestamp) return 'Just now';
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleDateString() + ' at ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+            
+            if (minutes < 1) return 'Just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
         }
 
         function escapeHtml(text) {
@@ -974,40 +1129,76 @@
         if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
             console.log('Demo mode - Firebase config needed for full functionality');
             
-            // Mock data for demo
+            // Mock data for demo with new categories
             posts = [
                 {
                     id: '1',
-                    title: 'Welcome to the Student Forum!',
-                    content: 'This is a demo post. To use this forum with real data, you\'ll need to set up Firebase authentication and Firestore.',
+                    title: 'Welcome to the Enhanced Student Forum! 🎉',
+                    content: 'This is our new and improved forum with better design and program-specific categories. Connect with your classmates and share knowledge!',
                     category: 'general',
-                    author: 'Admin',
+                    author: 'Forum Admin',
                     timestamp: new Date(),
-                    likes: 5,
-                    likedBy: [],
-                    replies: [
-                        {
-                            content: 'Thanks for setting this up! Looking forward to using it.',
-                            author: 'Student1',
-                            timestamp: new Date(Date.now() - 1800000)
-                        }
-                    ]
+                    likes: 12
                 },
                 {
                     id: '2',
-                    title: 'Study Group for Mathematics',
-                    content: 'Looking for students interested in forming a study group for advanced mathematics. We meet every Tuesday and Thursday.',
-                    category: 'study',
-                    author: 'Math Student',
+                    title: 'BSHM Study Group - Hospitality Management',
+                    content: 'Hey BSHM students! I\'m organizing a study group for our hospitality management course. We\'ll cover customer service excellence and hotel operations. Who\'s interested?',
+                    category: 'bshm',
+                    author: 'Maria Santos',
                     timestamp: new Date(Date.now() - 3600000),
-                    likes: 3,
-                    likedBy: [],
-                    replies: []
+                    likes: 8
+                },
+                {
+                    id: '3',
+                    title: 'Arduino Project Ideas for BSIT-ELEC',
+                    content: 'Looking for creative Arduino project ideas for our final project. Anyone working on something interesting? Let\'s collaborate and share resources!',
+                    category: 'bsit-elec',
+                    author: 'Tech Explorer',
+                    timestamp: new Date(Date.now() - 7200000),
+                    likes: 15
+                },
+                {
+                    id: '4',
+                    title: 'Automation Internship Opportunities',
+                    content: 'Found some great internship opportunities in automation and robotics. Companies are actively looking for BSIT-AUTO students. Check the job board!',
+                    category: 'bsit-auto',
+                    author: 'Career Advisor',
+                    timestamp: new Date(Date.now() - 10800000),
+                    likes: 23
+                },
+                {
+                    id: '5',
+                    title: 'Information Systems Development Workshop',
+                    content: 'Join us for a hands-on workshop on modern web development frameworks. Perfect for BSINFO.TECH students wanting to enhance their coding skills!',
+                    category: 'bsinfo-tech',
+                    author: 'Code Master',
+                    timestamp: new Date(Date.now() - 14400000),
+                    likes: 19
                 }
             ];
             displayPosts();
             updateStats();
         }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate stats on load
+            const statsNumbers = document.querySelectorAll('.stats-number');
+            statsNumbers.forEach(stat => {
+                const finalValue = parseInt(stat.textContent);
+                let currentValue = 0;
+                const increment = finalValue / 30;
+                const timer = setInterval(() => {
+                    currentValue += increment;
+                    if (currentValue >= finalValue) {
+                        currentValue = finalValue;
+                        clearInterval(timer);
+                    }
+                    stat.textContent = Math.floor(currentValue);
+                }, 50);
+            });
+        });
     </script>
 </body>
 </html>
