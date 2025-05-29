@@ -155,8 +155,8 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #1e3a8a;
+            box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
         }
 
         textarea.form-control {
@@ -238,7 +238,7 @@
         .action-btn {
             background: none;
             border: none;
-            color: #667eea;
+            color: #1e3a8a;
             cursor: pointer;
             padding: 5px 10px;
             border-radius: 20px;
@@ -250,7 +250,108 @@
         }
 
         .action-btn:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(30, 58, 138, 0.1);
+        }
+
+        .action-btn.liked {
+            background: rgba(30, 58, 138, 0.1);
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+
+        .replies-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .reply-form {
+            margin-bottom: 20px;
+        }
+
+        .replies-list {
+            space-y: 15px;
+        }
+
+        .reply {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #1e3a8a;
+        }
+
+        .reply-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .reply-author {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .reply-time {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .reply-content {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .share-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .share-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .share-options {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .share-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .share-btn.copy {
+            background: #10b981;
+            color: white;
+        }
+
+        .share-btn.copy:hover {
+            background: #059669;
         }
 
         .auth-modal {
@@ -302,13 +403,13 @@
         }
 
         .category-btn.active {
-            background: #667eea;
-            border-color: #667eea;
+            background: #1e3a8a;
+            border-color: #1e3a8a;
             color: white;
         }
 
         .stats-card {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #1e3a8a, #fbbf24);
             color: white;
             padding: 20px;
             border-radius: 15px;
@@ -459,15 +560,35 @@
         </div>
     </div>
 
+    <!-- Share Modal -->
+    <div id="shareModal" class="share-modal hidden">
+        <div class="share-modal-content">
+            <h3>Share This Post</h3>
+            <p id="sharePostTitle"></p>
+            <div class="share-options">
+                <button class="share-btn copy" onclick="copyPostLink()">
+                    📋 Copy Link
+                </button>
+                <button class="share-btn" onclick="shareToSocial('twitter')">
+                    🐦 Twitter
+                </button>
+                <button class="share-btn" onclick="shareToSocial('facebook')">
+                    📘 Facebook
+                </button>
+            </div>
+            <button class="btn btn-secondary" onclick="hideShareModal()">Close</button>
+        </div>
+    </div>
+
     <script>
         // Firebase configuration (replace with your actual config)
 	const firebaseConfig = {
-  	apiKey: "AIzaSyBgNuWFTCB5fb1q4WMXLHeORnIOO5VJnzY",
-  	authDomain: "forum-e7d82.firebaseapp.com",
-  	projectId: "forum-e7d82",
- 	 storageBucket: "forum-e7d82.firebasestorage.app",
- 	 messagingSenderId: "981123692929",
- 	 appId: "1:981123692929:web:31fb637d6e61dff30c5080"
+	  apiKey: "AIzaSyBgNuWFTCB5fb1q4WMXLHeORnIOO5VJnzY",
+	  authDomain: "forum-e7d82.firebaseapp.com",
+	  projectId: "forum-e7d82",
+	  storageBucket: "forum-e7d82.firebasestorage.app",
+	  messagingSenderId: "981123692929",
+	  appId: "1:981123692929:web:31fb637d6e61dff30c5080"
 	};
 
         // Initialize Firebase
@@ -478,6 +599,7 @@
         let currentUser = null;
         let currentFilter = 'all';
         let posts = [];
+        let currentSharePostId = null;
 
         // Auth state observer
         auth.onAuthStateChanged((user) => {
@@ -582,7 +704,8 @@
                     authorId: currentUser.uid,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     likes: 0,
-                    likedBy: []
+                    likedBy: [],
+                    replies: []
                 });
 
                 document.getElementById('postTitle').value = '';
@@ -614,6 +737,110 @@
             }
         }
 
+        function toggleReplies(postId) {
+            const repliesSection = document.getElementById(`replies-${postId}`);
+            repliesSection.classList.toggle('hidden');
+        }
+
+        async function addReply(postId) {
+            if (!currentUser) {
+                alert('Please log in to reply');
+                return;
+            }
+
+            const replyInput = document.getElementById(`reply-input-${postId}`);
+            const content = replyInput.value.trim();
+
+            if (!content) {
+                alert('Please enter a reply');
+                return;
+            }
+
+            try {
+                const postRef = db.collection('posts').doc(postId);
+                const newReply = {
+                    content: content,
+                    author: currentUser.displayName || currentUser.email,
+                    authorId: currentUser.uid,
+                    timestamp: new Date()
+                };
+
+                await postRef.update({
+                    replies: firebase.firestore.FieldValue.arrayUnion(newReply)
+                });
+
+                replyInput.value = '';
+                loadPosts();
+            } catch (error) {
+                console.error('Error adding reply:', error);
+                alert('Error adding reply. Please try again.');
+            }
+        }
+
+        function sharePost(postId, title) {
+            currentSharePostId = postId;
+            document.getElementById('sharePostTitle').textContent = title;
+            document.getElementById('shareModal').classList.remove('hidden');
+        }
+
+        function hideShareModal() {
+            document.getElementById('shareModal').classList.add('hidden');
+            currentSharePostId = null;
+        }
+
+        function copyPostLink() {
+            const postUrl = `${window.location.origin}${window.location.pathname}#post-${currentSharePostId}`;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(postUrl).then(() => {
+                    alert('Link copied to clipboard!');
+                    hideShareModal();
+                }).catch(() => {
+                    fallbackCopyText(postUrl);
+                });
+            } else {
+                fallbackCopyText(postUrl);
+            }
+        }
+
+        function fallbackCopyText(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Link copied to clipboard!');
+                hideShareModal();
+            } catch (err) {
+                alert('Unable to copy link. Please copy manually: ' + text);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function shareToSocial(platform) {
+            const post = posts.find(p => p.id === currentSharePostId);
+            const postUrl = `${window.location.origin}${window.location.pathname}#post-${currentSharePostId}`;
+            const text = `Check out this post: "${post.title}"`;
+            
+            let shareUrl;
+            
+            switch(platform) {
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(postUrl)}`;
+                    break;
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl)}`;
+                    break;
+                default:
+                    return;
+            }
+            
+            window.open(shareUrl, '_blank', 'width=600,height=400');
+            hideShareModal();
+        }
+
         function displayPosts() {
             const container = document.getElementById('postsContainer');
             const filteredPosts = currentFilter === 'all' ? posts : posts.filter(post => post.category === currentFilter);
@@ -624,7 +851,7 @@
             }
 
             container.innerHTML = filteredPosts.map(post => `
-                <div class="post">
+                <div class="post" id="post-${post.id}">
                     <div class="post-header">
                         <div>
                             <div class="post-title">${escapeHtml(post.title)}</div>
@@ -641,15 +868,35 @@
                     </div>
                     <div class="post-content">${escapeHtml(post.content)}</div>
                     <div class="post-actions">
-                        <button class="action-btn" onclick="likePost('${post.id}')">
+                        <button class="action-btn ${post.likedBy && currentUser && post.likedBy.includes(currentUser.uid) ? 'liked' : ''}" onclick="likePost('${post.id}')">
                             👍 ${post.likes || 0}
                         </button>
-                        <button class="action-btn">
-                            💬 Reply
+                        <button class="action-btn" onclick="toggleReplies('${post.id}')">
+                            💬 ${(post.replies || []).length} ${(post.replies || []).length === 1 ? 'Reply' : 'Replies'}
                         </button>
-                        <button class="action-btn">
+                        <button class="action-btn" onclick="sharePost('${post.id}', '${escapeHtml(post.title).replace(/'/g, "\\'")}')">
                             🔗 Share
                         </button>
+                    </div>
+                    <div id="replies-${post.id}" class="replies-section hidden">
+                        ${currentUser ? `
+                            <div class="reply-form">
+                                <textarea id="reply-input-${post.id}" class="form-control" placeholder="Write a reply..." rows="3"></textarea>
+                                <button class="btn" onclick="addReply('${post.id}')" style="margin-top: 10px;">Post Reply</button>
+                            </div>
+                        ` : '<p style="text-align: center; color: #666; margin: 15px 0;">Please log in to reply</p>'}
+                        <div id="replies-list-${post.id}" class="replies-list">
+                            ${(post.replies || []).map(reply => `
+                                <div class="reply">
+                                    <div class="reply-header">
+                                        <div class="author-avatar">${(reply.author || 'A')[0].toUpperCase()}</div>
+                                        <span class="reply-author">${escapeHtml(reply.author || 'Anonymous')}</span>
+                                        <span class="reply-time">${formatDate(reply.timestamp)}</span>
+                                    </div>
+                                    <div class="reply-content">${escapeHtml(reply.content)}</div>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             `).join('');
@@ -736,7 +983,15 @@
                     category: 'general',
                     author: 'Admin',
                     timestamp: new Date(),
-                    likes: 5
+                    likes: 5,
+                    likedBy: [],
+                    replies: [
+                        {
+                            content: 'Thanks for setting this up! Looking forward to using it.',
+                            author: 'Student1',
+                            timestamp: new Date(Date.now() - 1800000)
+                        }
+                    ]
                 },
                 {
                     id: '2',
@@ -745,7 +1000,9 @@
                     category: 'study',
                     author: 'Math Student',
                     timestamp: new Date(Date.now() - 3600000),
-                    likes: 3
+                    likes: 3,
+                    likedBy: [],
+                    replies: []
                 }
             ];
             displayPosts();
